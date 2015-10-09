@@ -10,6 +10,7 @@ public class MemoriesConfig : MonoBehaviour
 	public LoadingFeedback loadingSystem;
 	public List<Memory> memoryList = new List<Memory> ();
 	public CalendarPopUp calendarPopup;
+	public MemoryFull memoryFull;
 	string myURL;
 	string fileName;
 	string memoryDay;
@@ -108,6 +109,9 @@ public class MemoriesConfig : MonoBehaviour
 			Memory newMemory = Instantiate (currentMemory, new Vector3 (0, -900, 0), Quaternion.identity) as Memory;
 			newMemory.transform.parent = masterParent.transform;
 			memoryList.Add (newMemory);
+
+			EventDelegate.Add(newMemory.transform.FindChild("ArrowButton").GetComponent<UIButton>().onClick, 
+			                  delegate () {memoryFull.UpdateData(newMemory);});
 		}
 
 		LoadPhotoAndText ();
