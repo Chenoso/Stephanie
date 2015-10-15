@@ -7,6 +7,10 @@ namespace Prime31
 {
 	public class EtceteraEventListener : MonoBehaviour
 	{
+
+		//public AddChild addChild;
+
+
 #if UNITY_IOS
 		void OnEnable()
 		{

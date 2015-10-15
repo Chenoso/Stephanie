@@ -96,10 +96,6 @@ public class SelectChildConfig : MonoBehaviour
 			List<Texture2D> childPhotosList = web.LoadList<Texture2D> ("photos");
 			Config.childTextures2D = childPhotosList;
 
-			for (int i = 0; i < Config.childNames.Count; i++) {
-				childListGO [i].GetComponentInChildren<UILabel> ().text = Config.childNames [i];
-			}
-			
 			for (int i = 0; i < childPhotosList.Count; i++) {
 				childListGO [i].GetComponentInChildren<UITexture> ().mainTexture = childPhotosList [i];
 				NGUITools.SetActive (childListGO [i].transform.Find ("ArrowButton").gameObject, true);
@@ -108,6 +104,10 @@ public class SelectChildConfig : MonoBehaviour
 				if (i < 3) {
 					childListGO [i + 1].transform.localPosition = new Vector3 (0, 444 - (190 * (i + 1)), 0);
 				}
+			}
+
+			for (int j = 0; j < Config.childNames.Count; j++) {
+				childListGO [j].GetComponentInChildren<UILabel> ().text = Config.childNames [j];
 			}
 
 			loadingSystem.CloseLoading();

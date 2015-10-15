@@ -64,10 +64,13 @@ public class CalendarPopUp : MonoBehaviour
 				Vector3 newPos = new Vector3 (-300 + (j * 100), -150 + (i * -100), 1);
 				Vector3 newSize = new Vector3 (1, 1, 1);
 				UIWidget tempDaylabel = Instantiate (dayLabelPrefab, new Vector3 (0, 0, 0), Quaternion.identity) as UIWidget;
+				tempDaylabel.GetComponent<BoxCollider>().enabled = false;
 				dayLabelsList.Add (tempDaylabel);
 				tempDaylabel.transform.parent = widgetContainer.transform;
 				tempDaylabel.transform.localPosition = newPos;
 				tempDaylabel.transform.localScale = newSize;
+
+
 
 				EventDelegate.Add(tempDaylabel.GetComponent<UIButton>().onClick, delegate () { memoriesConfig.OpenMemories(
 						tempDaylabel.GetComponentInChildren<UILabel>().text,
@@ -103,6 +106,7 @@ public class CalendarPopUp : MonoBehaviour
 
 		while (curDisplay.Month == iMonth.Month) {
 			dayLabelsList [index].GetComponentInChildren<UILabel> ().text = curDisplay.Day.ToString ();
+			dayLabelsList [index].GetComponentInChildren<BoxCollider> ().enabled = true;
 			curDisplay = curDisplay.AddDays (1);
 			index++;
 		}
@@ -238,6 +242,7 @@ public class CalendarPopUp : MonoBehaviour
 			
 		} else {
 			loadingSystem.CloseLoading();
+			Config.currentChildDatesCalendarList.Clear();
 			Config.currentChildDatesCalendarList = web.LoadList<ArrayWrapper> ("memoriesDates");
 			
 			Debug.Log ("Finished downloading memory text...");

@@ -52,6 +52,11 @@ public class MemoriesConfig : MonoBehaviour
 	{
 		loadingSystem.ShowLoadingDownload ();
 
+		Config.currentChildDayMemoriesCount = 0;
+		Config.currentChildDayMemoriesList.Clear ();
+		Config.currentChildDayMemoriesPhotoList.Clear ();
+		Config.currentChildDayMemoriesThumbList.Clear ();
+
 		myURL = Config.masterURL;
 		fileName = Config.currentChild;
 
@@ -66,8 +71,7 @@ public class MemoriesConfig : MonoBehaviour
 		memoryDay = Config.currentDay;
 		memoryMonth = Config.currentMonth;
 		memoryYear = Config.currentYear;
-		
-		Debug.Log ("#######################");
+
 		Debug.Log ("Starting download count!");
 		
 		StartCoroutine ("DownloadMemoryCount");
@@ -95,8 +99,11 @@ public class MemoriesConfig : MonoBehaviour
 			//Make user go back to login if error
 			
 		} else {
+
+			Debug.Log ("Total #: " + Config.currentChildDayMemoriesCount);
+
 			Config.currentChildDayMemoriesCount = web.Load<int> (memoryDay + "_" + memoryMonth + "_" + memoryYear + "_count");
-			Debug.Log ("Finished downloading memory count...");
+			Debug.Log ("Finished memory from: " + memoryDay + "_" + memoryMonth + "_" + memoryYear);
 			Debug.Log ("Total memories: " + Config.currentChildDayMemoriesCount);
 
 			CreateMemoriesList ();
