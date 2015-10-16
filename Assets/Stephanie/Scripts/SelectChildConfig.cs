@@ -47,7 +47,7 @@ public class SelectChildConfig : MonoBehaviour
 		}
 
 		myURL = Config.masterURL;
-		fileName = "childList.txt";
+		fileName = Config.user + ".txt";
 
 		myURL += "?webfilename=" + fileName +
 			"&webusername=" + Config.masterUser +

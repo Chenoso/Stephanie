@@ -8,6 +8,8 @@ public class Config : MonoBehaviour {
 	public static string masterUser = "cheny";
 	public static string masterPass = "chenyrox";
 
+	public static string user;
+
 	public static int childNumber = 0;
 	public static List<string> childNames = new List<string>();
 	public static List<Texture2D> childTextures2D = new List<Texture2D>();

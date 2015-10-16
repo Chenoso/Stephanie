@@ -966,30 +966,32 @@ public class UILabel : UIWidget
 				if (fnt == font)
 				{
 					fnt.RequestCharactersInTexture(lbl.mText, lbl.mFinalFontSize, lbl.mFontStyle);
-					lbl.RemoveFromPanel();
-					lbl.CreatePanel();
+					lbl.MarkAsChanged();
 
-					if (mTempPanelList == null)
-						mTempPanelList = new List<UIPanel>();
+					if (lbl.panel == null)
+						lbl.CreatePanel();
 
-					if (!mTempPanelList.Contains(lbl.panel))
-						mTempPanelList.Add(lbl.panel);
+					if (mTempDrawcalls == null)
+						mTempDrawcalls = new List<UIDrawCall>();
+
+					if (lbl.drawCall != null && !mTempDrawcalls.Contains(lbl.drawCall))
+						mTempDrawcalls.Add(lbl.drawCall);
 				}
 			}
 		}
 
-		if (mTempPanelList != null)
+		if (mTempDrawcalls != null)
 		{
-			for (int i = 0, imax = mTempPanelList.Count; i < imax; ++i)
+			for (int i = 0, imax = mTempDrawcalls.Count; i < imax; ++i)
 			{
-				UIPanel p = mTempPanelList[i];
-				p.Refresh();
+				UIDrawCall dc = mTempDrawcalls[i];
+				if (dc.panel != null) dc.panel.FillDrawCall(dc);
 			}
-			mTempPanelList.Clear();
+			mTempDrawcalls.Clear();
 		}
 	}
 
-	static List<UIPanel> mTempPanelList;
+	static List<UIDrawCall> mTempDrawcalls;
 
 	/// <summary>
 	/// Get the sides of the rectangle relative to the specified transform.
