@@ -8,12 +8,13 @@ public class Config : MonoBehaviour {
 	public static string masterUser = "cheny";
 	public static string masterPass = "chenyrox";
 
-	public static string user;
+	public static string user = "TestUser";
 
 	public static int childNumber = 0;
 	public static List<string> childNames = new List<string>();
 	public static List<Texture2D> childTextures2D = new List<Texture2D>();
-	
+
+	public static string currentChildName;
 	public static string currentChild;
 	public static int currentChildDayMemoriesCount;
 	public static List<ArrayWrapper> currentChildDatesCalendarList = new List<ArrayWrapper>();

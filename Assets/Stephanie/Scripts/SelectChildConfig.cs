@@ -98,16 +98,14 @@ public class SelectChildConfig : MonoBehaviour
 
 			for (int i = 0; i < childPhotosList.Count; i++) {
 				childListGO [i].GetComponentInChildren<UITexture> ().mainTexture = childPhotosList [i];
+				childListGO [i].GetComponentInChildren<UILabel> ().text = Config.childNames [i];
+
 				NGUITools.SetActive (childListGO [i].transform.Find ("ArrowButton").gameObject, true);
 				NGUITools.SetActive (childListGO [i].transform.Find ("Button").gameObject, false);
 
 				if (i < 3) {
 					childListGO [i + 1].transform.localPosition = new Vector3 (0, 444 - (190 * (i + 1)), 0);
 				}
-			}
-
-			for (int j = 0; j < Config.childNames.Count; j++) {
-				childListGO [j].GetComponentInChildren<UILabel> ().text = Config.childNames [j];
 			}
 
 			loadingSystem.CloseLoading();
@@ -131,14 +129,21 @@ public class SelectChildConfig : MonoBehaviour
 	 * 
 	 */ 
 
-	public void OnClickCurrentChild(string childName){
-		childName = childName.Replace (" ", string.Empty);
+	public void OnClickCurrentChild(string _childName){
+		string childName = _childName.Replace (" ", string.Empty);
+		Config.currentChildName = _childName;
 		Config.currentChild = childName + ".txt";
 		Config.currentChildDayMemoriesCount = 0;
 		Config.currentChildDayMemoriesList.Clear ();
 		Config.currentChildDayMemoriesPhotoList.Clear ();
 		Config.currentChildDayMemoriesThumbList.Clear ();
 		Config.currentChildDatesCalendarList.Clear ();
-		calendarPanel.ShowCalendar ();
+
+		for (int i = 0; i < Config.childTextures2D.Count; i++) {
+			if(Config.currentChildName == Config.childNames [i]){
+				calendarPanel.ShowCalendar (Config.childNames [i], Config.childTextures2D [i]);
+				return;
+			}
+		}
 	}
 }

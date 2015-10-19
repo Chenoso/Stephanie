@@ -10,18 +10,18 @@ public class CalendarPopUp : MonoBehaviour
 	public UIWidget dayLabelPrefab;
 	public UIWidget widgetContainer;
 	public UILabel HeaderLabel;         //The label used to show the Month
-	//public string[] Months;             //Holds the months
+	public LoadingFeedback loadingSystem;
+	public MemoriesConfig memoriesConfig;
+	public string calendarMonth;
+	public string calendarYear;
+	public CurrenChild currentChild;
+
 	private List<UIWidget> dayLabelsList;         //Holds 42 labels - need 42 it's more right
 	private List<string> monthsBR = new List<string> ();
 	private int monthCounter = DateTime.Now.Month - 1;
 	private int yearCounter = 0;
 	private DateTime iMonth;
 	private DateTime curDisplay;
-	public LoadingFeedback loadingSystem;
-	public MemoriesConfig memoriesConfig;
-
-	public string calendarMonth;
-	public string calendarYear;
 
 	string myURL;
 	string fileName;
@@ -195,7 +195,7 @@ public class CalendarPopUp : MonoBehaviour
 		}
 	}
 
-	public void ShowCalendar ()
+	public void ShowCalendar (string childName, Texture2D childPhoto)
 	{
 		Vector3 newPos = new Vector3 (0, 0, 0);
 		transform.localPosition = newPos;
@@ -212,13 +212,17 @@ public class CalendarPopUp : MonoBehaviour
 			"&webusername=" + Config.masterUser +
 				"&webpassword=" + Config.masterPass;
 
+		currentChild.UpdateData (childName, childPhoto);
 		UpdateData ();
+
 	}
 
 	public void CloseCalendar ()
 	{
 		Vector3 newPos = new Vector3 (900, 0, 0);
 		transform.localPosition = newPos;
+
+		currentChild.closeCurrentChild ();
 	}
 
 	public void UpdateData(){

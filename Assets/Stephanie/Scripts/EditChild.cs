@@ -10,6 +10,7 @@ public class EditChild : MonoBehaviour {
 	public UIInput nameUIInput;
 	public LoadingFeedback loadingSystem;
 	public GameObject confirmButton;
+	public CurrenChild currentChild;
 	
 	WebCamTexture webcamTexture;
 	string myURL;
@@ -17,6 +18,8 @@ public class EditChild : MonoBehaviour {
 	string memoryDay;
 	string memoryMonth;
 	string memoryYear;
+
+	int indexToEdit;
 	
 	void LoadConfigs(){
 		myURL = Config.masterURL;
@@ -42,7 +45,7 @@ public class EditChild : MonoBehaviour {
 	{
 		Vector3 newPosX = new Vector3 (0, 0, 0);
 		transform.localPosition = newPosX;
-		
+
 		LoadConfigs ();
 	}
 	
@@ -55,7 +58,8 @@ public class EditChild : MonoBehaviour {
 		webcamTexture.Stop ();
 		webcamTexture = null;
 		#endif
-		
+
+		currentChild.showCurrentChild ();
 		loadingSystem.CloseLoading ();
 		NGUITools.SetActive (confirmButton, false);
 		photoUITexture.mainTexture = null;
@@ -91,7 +95,14 @@ public class EditChild : MonoBehaviour {
 		Debug.Log ("Starting uploading names...");
 		
 		List<string> childNamesList = Config.childNames;
-		childNamesList.Add (nameUIInput.value);
+
+		for (int i = 0; i < childNamesList.Count; i++) {
+			if(childNamesList[i] == Config.currentChildName){
+				childNamesList[i] = nameUIInput.value;
+				indexToEdit = i;
+				break;
+			}
+		}
 		
 		ES2Web web = new ES2Web (myURL + "&tag=names");
 		
@@ -103,7 +114,7 @@ public class EditChild : MonoBehaviour {
 		}
 		
 		if (web.isDone) {
-			Debug.Log ("New names uploaded!");
+			Debug.Log ("Edited names uploaded!");
 			StartCoroutine ("UploadChildPhotos");
 		}
 	}
@@ -114,10 +125,7 @@ public class EditChild : MonoBehaviour {
 		
 		List<Texture2D> childPhotoList = Config.childTextures2D;
 		Texture2D texture = photoUITexture.mainTexture as Texture2D;
-		//Texture2D texture = new Texture2D(photoUITexture.width, photoUITexture.height, TextureFormat.PVRTC_RGBA2, false);
-		//texture = photoUITexture.mainTexture as Texture2D;
-		
-		childPhotoList.Add (texture);
+		childPhotoList[indexToEdit] = texture;
 		
 		ES2Web web = new ES2Web (myURL + "&tag=photos");
 		
@@ -129,7 +137,8 @@ public class EditChild : MonoBehaviour {
 		}
 		
 		if (web.isDone) {
-			Debug.Log ("New photos uploaded!");
+			Debug.Log ("Edited photos uploaded!");
+			currentChild.UpdateData(Config.childNames[indexToEdit], Config.childTextures2D[indexToEdit]);
 			CloseEditChild ();
 			selectChildConfig.UpdateData ();
 		}
@@ -262,7 +271,7 @@ public class EditChild : MonoBehaviour {
 	
 	void imagePickerCancelled()
 	{
-		CloseEditChild ();
+		//CloseEditChild ();
 		Debug.Log( "imagePickerCancelled" );
 	}
 	
