@@ -6,11 +6,12 @@ public class MemoriesConfig : MonoBehaviour
 {
 	
 	public Memory currentMemory;
-	public GameObject masterParent;
 	public LoadingFeedback loadingSystem;
-	public List<Memory> memoryList = new List<Memory> ();
 	public CalendarPopUp calendarPopup;
 	public MemoryFull memoryFull;
+	public UIScrollView scrollView;
+	public UITable scrollTableView;
+	public List<Memory> memoryList = new List<Memory> ();
 	string myURL;
 	string fileName;
 	string memoryDay;
@@ -114,13 +115,18 @@ public class MemoriesConfig : MonoBehaviour
 	{
 		for (int i = 0; i < Config.currentChildDayMemoriesCount; i++) {
 			Memory newMemory = Instantiate (currentMemory, new Vector3 (0, -900, 0), Quaternion.identity) as Memory;
-			newMemory.transform.parent = masterParent.transform;
+			newMemory.transform.parent = scrollTableView.transform;
+			newMemory.transform.localScale = new Vector3(1,1,1);
+			newMemory.GetComponent<UIDragScrollView>().scrollView = scrollView;
 			memoryList.Add (newMemory);
 
-			EventDelegate.Add(newMemory.transform.FindChild("ArrowButton").GetComponent<UIButton>().onClick, 
-			                  delegate () {memoryFull.UpdateData(newMemory);});
+			Vector3 newPos = new Vector3 (0, 541 - (i * 780), 0);
+			newMemory.transform.localPosition = newPos;
+
+			EventDelegate.Add(newMemory.GetComponent<UIButton>().onClick, delegate () {memoryFull.UpdateData(newMemory);});
 		}
 
+		NGUITools.ImmediatelyCreateDrawCalls(scrollTableView.gameObject);
 		LoadPhotoAndText ();
 	}
 
@@ -170,6 +176,7 @@ public class MemoriesConfig : MonoBehaviour
 
 			for (int i = 0; i < Config.currentChildDayMemoriesCount; i++) {
 				memoryList [i].CreateMemoryText (
+					i,
 					Config.currentChildDayMemoriesList [i].array [0],
 					Config.currentChildDayMemoriesList [i].array [1],
 					Config.currentChildDayMemoriesList [i].array [2],
@@ -216,13 +223,18 @@ public class MemoriesConfig : MonoBehaviour
 
 			for (int i = 0; i < Config.currentChildDayMemoriesCount; i++) {
 				memoryList [i].CreateMemoryPhoto (Config.currentChildDayMemoriesThumbList[i]);
-
-				Vector3 newPos = new Vector3 (0, 444 - (i * 190), 0);
-				memoryList [i].transform.localPosition = newPos;
 			}
 
-			loadingSystem.CloseLoading ();
+			StartCoroutine("AdjustLayout");
 		}
+	}
+
+	private IEnumerator AdjustLayout(){
+		yield return new WaitForSeconds (0.1f);
+		scrollTableView.repositionNow = true;
+		scrollTableView.Reposition();
+		scrollView.ResetPosition();
+		loadingSystem.CloseLoading ();
 	}
 
 	public void UpdateData ()

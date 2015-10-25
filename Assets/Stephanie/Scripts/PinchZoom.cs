@@ -3,9 +3,13 @@ using System.Collections;
 
 public class PinchZoom : MonoBehaviour
 {
+	public UIScrollView currentScrollView;
+	private Vector3 originalScrollViewOffset;
+	private Vector2 originalScrollPos;
+
 	public Camera theCamera;
 	private float scale_factor = 0.07f;
-	private float MAXSCALE = 6.0f, MIN_SCALE = 0.6f; // zoom-in and zoom-out limits
+	private float MAXSCALE = 3.0f, MIN_SCALE = 0.8f; // zoom-in and zoom-out limits
 	private bool isMousePressed;
 	private Vector2 prevDist = new Vector2 (0, 0);
 	private Vector2 curDist = new Vector2 (0, 0);
@@ -19,25 +23,24 @@ public class PinchZoom : MonoBehaviour
 		// Game Object will be created and make current object as its child (only because we can set virtual anchor point of gameobject and can zoom in and zoom out from particular position)
 		parentObject = new GameObject ("ParentObject");
 		parentObject.transform.parent = transform.parent;
-		parentObject.transform.position = new Vector3 (transform.position.x * -1, transform.position.y * -1, transform.position.z);
+		parentObject.transform.localPosition = new Vector3 (transform.localPosition.x * -1, transform.localPosition.y * -1, transform.localPosition.z);
 		parentObject.transform.localScale = new Vector3 (1, 1, 1);
 		transform.parent = parentObject.transform;
 
+		transform.localPosition = new Vector3 (0, 0, 0);
 
-
-		parentObject.transform.localScale = new Vector3 (1, 0.56221f, 1);
+		parentObject.transform.localScale = new Vector3 (1, 1, 1);
 
 		ScreenSize = theCamera.ScreenToWorldPoint (new Vector2 (Screen.width, Screen.height));
-
-		Debug.Log (Screen.width);
-		Debug.Log (Screen.height);
-		Debug.Log (ScreenSize);
-		originalPos = transform.position;
+		originalPos = transform.localPosition;
+		originalScrollPos = currentScrollView.transform.localPosition;
+		originalScrollViewOffset = currentScrollView.GetComponent<UIPanel> ().clipOffset;
 		isMousePressed = false;
 	}
 
 	void Update ()
 	{
+		/*
 		if (Input.GetMouseButtonDown (0))
 			isMousePressed = true;
 		else if (Input.GetMouseButtonUp (0))
@@ -46,7 +49,7 @@ public class PinchZoom : MonoBehaviour
 		if (isMousePressed && Input.touchCount == 1 && Input.GetTouch (0).phase == TouchPhase.Moved && (parentObject.transform.localScale.x > MIN_SCALE || parentObject.transform.localScale.y > MIN_SCALE)) {
 			Touch touch = Input.GetTouch (0);	
 			Vector3 diff = touch.deltaPosition * 0.0075f;	
-			Vector3 pos = transform.position + diff;
+			Vector3 pos = transform.localPosition + diff;
 			if (pos.x > ScreenSize.x * (parentObject.transform.localScale.x - 1)){
 				pos.x = ScreenSize.x * (parentObject.transform.localScale.x - 1);
 			};
@@ -60,14 +63,27 @@ public class PinchZoom : MonoBehaviour
 			if (pos.y < ScreenSize.y * (parentObject.transform.localScale.y - 1) * -1){
 				pos.y = ScreenSize.y * (parentObject.transform.localScale.y - 1) * -1;
 			};
-			transform.position = pos;
+			transform.localPosition = pos;
 		}
 		// On double tap image will be set at original position and scale
 		else if (Input.touchCount == 1 && Input.GetTouch (0).phase == TouchPhase.Began && Input.GetTouch (0).tapCount == 2) {
 			parentObject.transform.localScale = Vector3.one;
-			parentObject.transform.position = new Vector3 (originalPos.x * -1, originalPos.y * -1, originalPos.z);
-			transform.position = originalPos;
+			parentObject.transform.localPosition = new Vector3 (originalPos.x * -1, originalPos.y * -1, originalPos.z);
+			transform.localPosition = originalPos;
 		}	
+		*/
+
+		if (Input.touchCount == 1 && Input.GetTouch (0).phase == TouchPhase.Began && Input.GetTouch (0).tapCount == 2) {
+			//parentObject.transform.localScale = Vector3.one;
+			//parentObject.transform.localPosition = new Vector3 (originalPos.x * -1, originalPos.y * -1, originalPos.z);
+			transform.localPosition = originalPos;
+			currentScrollView.transform.localPosition = originalScrollPos;
+			currentScrollView.GetComponent<UIPanel>().clipOffset = originalScrollViewOffset;
+			currentScrollView.GetComponent<UICenterOnChild>().enabled = true;
+			GetComponent<UITexture>().width = 720;
+			GetComponent<UIDragScrollView> ().enabled = false;
+		}
+
 		checkForMultiTouch ();
 	}
 
@@ -101,14 +117,16 @@ public class PinchZoom : MonoBehaviour
 				}
 			}
 		}
+
+		/*
 		// On touch end just check whether image is within screen or not
 		else if (Input.touchCount == 2 && (Input.GetTouch (0).phase == TouchPhase.Ended || Input.GetTouch (0).phase == TouchPhase.Canceled || Input.GetTouch (1).phase == TouchPhase.Ended || Input.GetTouch (1).phase == TouchPhase.Canceled)) {
 			if (parentObject.transform.localScale.x < 1 || parentObject.transform.localScale.y < 1) {
 				parentObject.transform.localScale = Vector3.one;
-				parentObject.transform.position = new Vector3 (originalPos.x * -1, originalPos.y * -1, originalPos.z);
-				transform.position = originalPos;
+				parentObject.transform.localPosition = new Vector3 (originalPos.x * -1, originalPos.y * -1, originalPos.z);
+				transform.localPosition = originalPos;
 			} else {
-				Vector3 pos = transform.position;
+				Vector3 pos = transform.localPosition;
 				if (pos.x > ScreenSize.x * (parentObject.transform.localScale.x - 1))
 					pos.x = ScreenSize.x * (parentObject.transform.localScale.x - 1);
 				if (pos.x < ScreenSize.x * (parentObject.transform.localScale.x - 1) * -1)
@@ -117,9 +135,10 @@ public class PinchZoom : MonoBehaviour
 					pos.y = ScreenSize.y * (parentObject.transform.localScale.y - 1);
 				if (pos.y < ScreenSize.y * (parentObject.transform.localScale.y - 1) * -1)
 					pos.y = ScreenSize.y * (parentObject.transform.localScale.y - 1) * -1;
-				transform.position = pos;
+				transform.localPosition = pos;
 			}
 		}
+		*/
 	}
 	//Following method scales the gameobject from particular position
 	static Vector3 prevPos = Vector3.zero;
@@ -127,13 +146,20 @@ public class PinchZoom : MonoBehaviour
 	private void scaleFromPosition (Vector3 scale, Vector3 fromPos)
 	{
 		if (!fromPos.Equals (prevPos)) {
-			Vector3 prevParentPos = parentObject.transform.position;
-			parentObject.transform.position = fromPos;	
-			Vector3 diff = parentObject.transform.position - prevParentPos;
-			Vector3 pos = new Vector3 (diff.x / parentObject.transform.localScale.x * -1, diff.y / parentObject.transform.localScale.y * -1, transform.position.z);
+			Vector3 prevParentPos = parentObject.transform.localPosition;
+			parentObject.transform.localPosition = fromPos;	
+			Vector3 diff = parentObject.transform.localPosition - prevParentPos;
+			Vector3 pos = new Vector3 (diff.x / parentObject.transform.localScale.x * -1, diff.y / parentObject.transform.localScale.y * -1, transform.localPosition.z);
 			transform.localPosition = new Vector3 (transform.localPosition.x + pos.x, transform.localPosition.y + pos.y, pos.z);
 		}
-		parentObject.transform.localScale = scale;
+
+		if (Mathf.CeilToInt (transform.GetComponent<UITexture> ().width * scale.x) < Mathf.CeilToInt (transform.GetComponent<UITexture> ().width * 4) ||
+		    Mathf.CeilToInt (transform.GetComponent<UITexture> ().width * scale.x) > Mathf.CeilToInt (transform.GetComponent<UITexture> ().width * 0.6f)) {
+			transform.GetComponent<UITexture> ().SetDimensions (Mathf.CeilToInt (transform.GetComponent<UITexture> ().width * scale.x), Mathf.CeilToInt (transform.GetComponent<UITexture> ().height * scale.y));
+			currentScrollView.GetComponent<UICenterOnChild>().enabled = false;
+		}
+
+		//parentObject.transform.localScale = scale;
 		prevPos = fromPos;
 	}
 

@@ -26,6 +26,12 @@ public class Config : MonoBehaviour {
 	public static string currentMonth;
 	public static string currentYear;
 
+	public static int currentMemoryIndex;
+	public static string currentMemoryDay;
+	public static string currentMemoryMonth;
+	public static string currentMemoryYear;
+	public static string currentMemoryTime;
+
 	// Use this for initialization
 	void Start () {
 	
