@@ -40,6 +40,11 @@ public class AddMemory : MonoBehaviour
 		memoryYear = Config.currentYear;
 
 		NGUITools.SetActive (confirmButton, false);
+
+		titleUILabel.value = "";
+		descriptionUILabel.value = "";
+
+		photoUITexture.mainTexture = null;
 		
 #if UNITY_EDITOR
 		webcamTexture = new WebCamTexture ();
@@ -170,7 +175,7 @@ public class AddMemory : MonoBehaviour
 		Texture2D memoryPhoto = photoUITexture.mainTexture as Texture2D;
 		Config.currentChildDayMemoriesPhotoList.Add (memoryPhoto);
 		
-		ES2Web web = new ES2Web (myURL + 
+		webProgress = new ES2Web (myURL + 
 			"&tag=" + 
 			memoryDay + 
 			"_" + 
@@ -179,17 +184,26 @@ public class AddMemory : MonoBehaviour
 			memoryYear + 
 			"_photo");
 
-		yield return StartCoroutine (web.Upload (Config.currentChildDayMemoriesPhotoList));
+		canCheckProgress = true;
+		yield return StartCoroutine (webProgress.Upload (Config.currentChildDayMemoriesPhotoList));
 		
-		if (web.isError) {
+		if (webProgress.isError) {
 			// Enter your own code to handle errors here.
-			Debug.LogError (web.errorCode + ":" + web.error);
+			Debug.LogError (webProgress.errorCode + ":" + webProgress.error);
 		}
 		
-		if (web.isDone) {
+		if (webProgress.isDone) {
 			Debug.Log ("New photo uploaded!");
 			StartCoroutine ("UploadPhotoThumb");
 		}
+	}
+
+	private ES2Web webProgress;
+	private bool canCheckProgress;
+
+	void Update(){
+		//if (canCheckProgress)
+			//Debug.Log (webProgress.www.uploadProgress);
 	}
 	
 	public IEnumerator UploadPhotoThumb ()
@@ -247,6 +261,8 @@ public class AddMemory : MonoBehaviour
 			loadingSystem.CloseLoading ();
 			memoriesConfig.UpdateData();
 		}
+
+		photoUITexture.mainTexture = null;
 	}
 
 	

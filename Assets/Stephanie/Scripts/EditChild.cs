@@ -29,7 +29,9 @@ public class EditChild : MonoBehaviour {
 			"&webusername=" + Config.masterUser +
 				"&webpassword=" + Config.masterPass;
 		
-		NGUITools.SetActive (confirmButton, false);
+		//NGUITools.SetActive (confirmButton, false);
+
+		nameUIInput.value = Config.currentChildName;
 		
 		#if UNITY_EDITOR
 		webcamTexture = new WebCamTexture ();
@@ -61,7 +63,7 @@ public class EditChild : MonoBehaviour {
 
 		currentChild.showCurrentChild ();
 		loadingSystem.CloseLoading ();
-		NGUITools.SetActive (confirmButton, false);
+		//NGUITools.SetActive (confirmButton, false);
 		photoUITexture.mainTexture = null;
 	}
 	
@@ -79,7 +81,7 @@ public class EditChild : MonoBehaviour {
 		PromptForPhoto ();
 		#endif
 		
-		NGUITools.SetActive (confirmButton, true);
+		//NGUITools.SetActive (confirmButton, true);
 	}
 	
 	public void UploadNewChild ()
@@ -94,11 +96,11 @@ public class EditChild : MonoBehaviour {
 	{
 		Debug.Log ("Starting uploading names...");
 		
-		List<string> childNamesList = Config.childNames;
+		List<ArrayWrapper> childNamesList = Config.childNames;
 
 		for (int i = 0; i < childNamesList.Count; i++) {
-			if(childNamesList[i] == Config.currentChildName){
-				childNamesList[i] = nameUIInput.value;
+			if(childNamesList[i].array[1] == Config.currentChildName){
+				childNamesList[i].array[1] = nameUIInput.value;
 				indexToEdit = i;
 				break;
 			}
@@ -138,7 +140,7 @@ public class EditChild : MonoBehaviour {
 		
 		if (web.isDone) {
 			Debug.Log ("Edited photos uploaded!");
-			currentChild.UpdateData(Config.childNames[indexToEdit], Config.childTextures2D[indexToEdit]);
+			currentChild.UpdateData(Config.childNames[indexToEdit].array[1], Config.childTextures2D[indexToEdit]);
 			CloseEditChild ();
 			selectChildConfig.UpdateData ();
 		}
@@ -280,7 +282,7 @@ public class EditChild : MonoBehaviour {
 	{
 		this.imagePath = imagePath;
 		LoadPhotoImage ();
-		NGUITools.SetActive (confirmButton, true);
+		//NGUITools.SetActive (confirmButton, true);
 		Debug.Log( "image picker chose image: " + imagePath );
 	}
 	

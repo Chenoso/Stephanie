@@ -46,6 +46,8 @@ public class Memory : MonoBehaviour {
 		memoryTime = time;
 	}
 	public void CreateMemoryPhoto(Texture2D photo){
+		DestroyImmediate (memoryPhoto.mainTexture, true);
+
 		memoryPhoto.mainTexture = photo;
 		currentTexture2D = photo;
 
@@ -54,5 +56,8 @@ public class Memory : MonoBehaviour {
 		memoryPhoto.width = 750;
 
 		transform.GetComponent<UIWidget> ().SetDimensions (750, memoryPhoto.height);
+
+		Resources.UnloadUnusedAssets ();
+		System.GC.Collect ();
 	}
 }

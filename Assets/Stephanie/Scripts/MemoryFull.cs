@@ -9,6 +9,8 @@ public class MemoryFull : MonoBehaviour {
 	public UILabel dateTime;
 
 	public UISprite blackBG;
+	public GameObject currentChildAsset;
+	public UIScrollView currentScrollView;
 
 	bool hasBlackBG;
 
@@ -26,12 +28,17 @@ public class MemoryFull : MonoBehaviour {
 		Vector3 newPos = new Vector3 (0, 0, 0);
 		transform.localPosition = newPos;
 
+		NGUITools.SetActive (currentChildAsset, false);
+		myPhoto.GetComponent<UIDragScrollView> ().enabled = true;
 	}
 
 	public void CloseMemoryFull(){
 		Vector3 newPos = new Vector3 (2700, 0, 0);
 		transform.localPosition = newPos;
 
+		NGUITools.SetActive (currentChildAsset, true);
+
+		ResetScale ();
 	}
 
 	public void UpdateData(Memory currentMemory){
@@ -51,6 +58,13 @@ public class MemoryFull : MonoBehaviour {
 		Config.currentMemoryMonth = currentMemory.memoryMonth;
 		Config.currentMemoryYear = currentMemory.memoryYear;
 		Config.currentMemoryTime = currentMemory.memoryTime;
+	}
+
+	private void ResetScale(){
+		currentScrollView.ResetPosition ();
+		myPhoto.MakePixelPerfect ();
+		myPhoto.keepAspectRatio = UIWidget.AspectRatioSource.BasedOnWidth;
+		myPhoto.width = 750;
 	}
 
 	public void MakeBlackBackground(){

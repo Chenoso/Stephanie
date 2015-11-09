@@ -17,7 +17,11 @@ public class PinchZoom : MonoBehaviour
 	private Vector2 ScreenSize;
 	private Vector3 originalPos;
 	private GameObject parentObject;
+
 	
+	int originalWidth;
+	int originalHeight;
+
 	void Start ()
 	{
 		// Game Object will be created and make current object as its child (only because we can set virtual anchor point of gameobject and can zoom in and zoom out from particular position)
@@ -36,6 +40,9 @@ public class PinchZoom : MonoBehaviour
 		originalScrollPos = currentScrollView.transform.localPosition;
 		originalScrollViewOffset = currentScrollView.GetComponent<UIPanel> ().clipOffset;
 		isMousePressed = false;
+
+		originalWidth = Mathf.CeilToInt (transform.GetComponent<UITexture> ().width);
+		originalHeight = Mathf.CeilToInt (transform.GetComponent<UITexture> ().height);
 	}
 
 	void Update ()
@@ -100,8 +107,14 @@ public class PinchZoom : MonoBehaviour
 			float touchDelta = curDist.magnitude - prevDist.magnitude;
 			// Zoom out
 			if (touchDelta > 0) {
+
+				//int thisWidth = Mathf.CeilToInt (transform.GetComponent<UITexture> ().width;
+				//int thisHeight = Mathf.CeilToInt (transform.GetComponent<UITexture> ().height;
+
 				if (parentObject.transform.localScale.x < MAXSCALE && parentObject.transform.localScale.y < MAXSCALE) {
+
 					Vector3 scale = new Vector3 (parentObject.transform.localScale.x + scale_factor, parentObject.transform.localScale.y + scale_factor, 1);
+
 					scale.x = (scale.x > MAXSCALE) ? MAXSCALE : scale.x;
 					scale.y = (scale.y > MAXSCALE) ? MAXSCALE : scale.y;
 					scaleFromPosition (scale, midPoint);
@@ -153,8 +166,8 @@ public class PinchZoom : MonoBehaviour
 			transform.localPosition = new Vector3 (transform.localPosition.x + pos.x, transform.localPosition.y + pos.y, pos.z);
 		}
 
-		if (Mathf.CeilToInt (transform.GetComponent<UITexture> ().width * scale.x) < Mathf.CeilToInt (transform.GetComponent<UITexture> ().width * 4) ||
-		    Mathf.CeilToInt (transform.GetComponent<UITexture> ().width * scale.x) > Mathf.CeilToInt (transform.GetComponent<UITexture> ().width * 0.6f)) {
+		if (Mathf.CeilToInt (transform.GetComponent<UITexture> ().width * scale.x) < originalWidth * 4 &&
+		    Mathf.CeilToInt (transform.GetComponent<UITexture> ().width * scale.x) > originalWidth * 1) {
 			transform.GetComponent<UITexture> ().SetDimensions (Mathf.CeilToInt (transform.GetComponent<UITexture> ().width * scale.x), Mathf.CeilToInt (transform.GetComponent<UITexture> ().height * scale.y));
 			currentScrollView.GetComponent<UICenterOnChild>().enabled = false;
 		}

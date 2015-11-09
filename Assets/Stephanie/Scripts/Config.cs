@@ -11,7 +11,7 @@ public class Config : MonoBehaviour {
 	public static string user = "TestUser";
 
 	public static int childNumber = 0;
-	public static List<string> childNames = new List<string>();
+	public static List<ArrayWrapper> childNames = new List<ArrayWrapper>();
 	public static List<Texture2D> childTextures2D = new List<Texture2D>();
 
 	public static string currentChildName;

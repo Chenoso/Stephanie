@@ -11,7 +11,9 @@ public class MemoriesConfig : MonoBehaviour
 	public MemoryFull memoryFull;
 	public UIScrollView scrollView;
 	public UITable scrollTableView;
-	public List<Memory> memoryList = new List<Memory> ();
+	public List<Memory> memoryList;
+	public UILabel currentDay;
+	public bool cameFromEditPhoto;
 	string myURL;
 	string fileName;
 	string memoryDay;
@@ -27,6 +29,19 @@ public class MemoriesConfig : MonoBehaviour
 		Config.currentMonth = month;
 		Config.currentYear = year;
 
+
+		if (int.Parse(day) < 10) {
+			day = "0" + day;
+		}
+		if (int.Parse(month) < 10) {
+			month = "0" + month;
+		}
+
+		//currentDay.text = day + "/" + month + "/" + year;
+
+		Vector3 newPos2 = new Vector3 (900, 0, 0);
+		calendarPopup.transform.localPosition = newPos2;
+
 		LoadConfigs ();
 	}
 
@@ -40,6 +55,8 @@ public class MemoriesConfig : MonoBehaviour
 		}
 		memoryList.Clear ();
 
+		Vector3 newPos2 = new Vector3 (0, 0, 0);
+		calendarPopup.transform.localPosition = newPos2;
 		calendarPopup.UpdateData ();
 	}
 
@@ -68,12 +85,20 @@ public class MemoriesConfig : MonoBehaviour
 		myURL += "?webfilename=" + fileName +
 			"&webusername=" + Config.masterUser +
 			"&webpassword=" + Config.masterPass;
-		
+
 		memoryDay = Config.currentDay;
 		memoryMonth = Config.currentMonth;
 		memoryYear = Config.currentYear;
 
+		Debug.Log ("@MEMORY DAY: " + memoryDay);
 		Debug.Log ("Starting download count!");
+
+		if (!cameFromEditPhoto) {
+			for (int j = 0; j < memoryList.Count; j++) {
+				Destroy (memoryList [j].gameObject);
+			}
+			memoryList.Clear ();
+		}
 		
 		StartCoroutine ("DownloadMemoryCount");
 	}
@@ -113,17 +138,20 @@ public class MemoriesConfig : MonoBehaviour
 
 	void CreateMemoriesList ()
 	{
-		for (int i = 0; i < Config.currentChildDayMemoriesCount; i++) {
-			Memory newMemory = Instantiate (currentMemory, new Vector3 (0, -900, 0), Quaternion.identity) as Memory;
-			newMemory.transform.parent = scrollTableView.transform;
-			newMemory.transform.localScale = new Vector3(1,1,1);
-			newMemory.GetComponent<UIDragScrollView>().scrollView = scrollView;
-			memoryList.Add (newMemory);
+		if (!cameFromEditPhoto) {
+			memoryList = new List<Memory> ();
 
-			Vector3 newPos = new Vector3 (0, 541 - (i * 780), 0);
-			newMemory.transform.localPosition = newPos;
+			for (int i = 0; i < Config.currentChildDayMemoriesCount; i++) {
+				Memory newMemory = Instantiate (currentMemory, new Vector3 (0, -900, 0), Quaternion.identity) as Memory;
+				newMemory.transform.parent = scrollTableView.transform;
+				newMemory.transform.localScale = new Vector3 (1, 1, 1);
+				newMemory.GetComponent<UIDragScrollView> ().scrollView = scrollView;
+				memoryList.Add (newMemory);
 
-			EventDelegate.Add(newMemory.GetComponent<UIButton>().onClick, delegate () {memoryFull.UpdateData(newMemory);});
+				EventDelegate.Add (newMemory.GetComponent<UIButton> ().onClick, delegate () {
+					memoryFull.UpdateData (newMemory);
+				});
+			}
 		}
 
 		NGUITools.ImmediatelyCreateDrawCalls(scrollTableView.gameObject);
@@ -213,6 +241,8 @@ public class MemoriesConfig : MonoBehaviour
 			
 		} else {
 			Debug.Log ("Finished downloading thumbs...");
+			Config.currentChildDayMemoriesThumbList.Clear();
+
 			Config.currentChildDayMemoriesThumbList = web.LoadList<Texture2D>(
 				memoryDay + 
 				"_" + 
@@ -223,7 +253,13 @@ public class MemoriesConfig : MonoBehaviour
 
 			for (int i = 0; i < Config.currentChildDayMemoriesCount; i++) {
 				memoryList [i].CreateMemoryPhoto (Config.currentChildDayMemoriesThumbList[i]);
+
+				//Vector3 newPos = new Vector3 (0, 530 - (i * 780), 0);
+				//memoryList[i].transform.localPosition = newPos;
 			}
+			web.www.Dispose();
+			web = null;
+			Resources.UnloadUnusedAssets();
 
 			StartCoroutine("AdjustLayout");
 		}
@@ -235,6 +271,8 @@ public class MemoriesConfig : MonoBehaviour
 		scrollTableView.Reposition();
 		scrollView.ResetPosition();
 		loadingSystem.CloseLoading ();
+
+		cameFromEditPhoto = false;
 	}
 
 	public void UpdateData ()

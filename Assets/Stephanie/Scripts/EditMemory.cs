@@ -13,6 +13,10 @@ public class EditMemory : MonoBehaviour
 	public MemoriesConfig memoriesConfig;
 	public GameObject confirmButton;
 
+	public UILabel currentPhotoTitle;
+	public UILabel currentPhotoDescription;
+	public UITexture currentPhotoTexture;
+
 	WebCamTexture webcamTexture;
 	string myURL;
 	string fileName;
@@ -107,7 +111,7 @@ public class EditMemory : MonoBehaviour
 	public IEnumerator UploadText ()
 	{
 		Debug.Log ("Starting uploading text...");
-		string memoryTime = System.DateTime.Now.ToString ("HH:mm");
+		//string memoryTime = System.DateTime.Now.ToString ("HH:mm");
 
 
 		//TODO Edit title, description
@@ -147,8 +151,6 @@ public class EditMemory : MonoBehaviour
 	{
 		Debug.Log ("Starting uploading photos...");
 		Texture2D memoryPhoto = photoUITexture.mainTexture as Texture2D;
-
-		Debug.Log (Config.currentMemoryIndex);
 
 		Config.currentChildDayMemoriesThumbList [Config.currentMemoryIndex] = memoryPhoto;
 
@@ -202,8 +204,18 @@ public class EditMemory : MonoBehaviour
 		
 		if (web.isDone) {
 			Debug.Log ("New thumb uploaded!");
+
+			currentPhotoTitle.text = titleUILabel.value;
+			currentPhotoDescription.text = descriptionUILabel.value;
+			currentPhotoTexture.mainTexture = memoryThumb;
+
+			currentPhotoTexture.MakePixelPerfect ();
+			currentPhotoTexture.keepAspectRatio = UIWidget.AspectRatioSource.BasedOnWidth;
+			currentPhotoTexture.width = 750;
+
 			CloseEditMemory();
 			loadingSystem.CloseLoading ();
+			memoriesConfig.cameFromEditPhoto = true;
 			memoriesConfig.UpdateData();
 		}
 	}

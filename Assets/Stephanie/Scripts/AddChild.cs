@@ -29,6 +29,10 @@ public class AddChild : MonoBehaviour
 
 		NGUITools.SetActive (confirmButton, false);
 
+		nameUIInput.value = "";
+
+		photoUITexture.mainTexture = null;
+
 #if UNITY_EDITOR
 		webcamTexture = new WebCamTexture ();
 		photoUITexture.mainTexture = webcamTexture;
@@ -91,13 +95,19 @@ public class AddChild : MonoBehaviour
 	{
 		Debug.Log ("Starting uploading names...");
 
-		List<string> childNamesList = Config.childNames;
-		childNamesList.Add (nameUIInput.value);
+		List<ArrayWrapper> childNamesList = Config.childNames;
+
+		childNamesList.Add(ArrayWrapper.Create (new string[]{
+			nameUIInput.value, //Name of the file
+			nameUIInput.value, //Current child name
+		}));
+
+		//childNamesList.Add (nameUIInput.value);
 
 		ES2Web web = new ES2Web (myURL + "&tag=names");
 		
 		yield return StartCoroutine (web.Upload (childNamesList));
-		
+
 		if (web.isError) {
 			// Enter your own code to handle errors here.
 			Debug.LogError (web.errorCode + ":" + web.error);
@@ -134,9 +144,9 @@ public class AddChild : MonoBehaviour
 			CloseAddNewChild ();
 			selectChildConfig.UpdateData ();
 		}
+
+		photoUITexture.mainTexture = null;
 	}
-
-
 
 #if UNITY_IOS
 	private string imagePath;

@@ -6,7 +6,7 @@ using System.Globalization;
 
 public class CalendarPopUp : MonoBehaviour
 {
-	
+	public GameObject childPanel;
 	public UIWidget dayLabelPrefab;
 	public UIWidget widgetContainer;
 	public UILabel HeaderLabel;         //The label used to show the Month
@@ -26,7 +26,19 @@ public class CalendarPopUp : MonoBehaviour
 	string myURL;
 	string fileName;
 
+	bool isActive;
+
 	Boolean firstTimeOpeningCalendar = true;
+
+	void Update(){
+		if (isActive) {
+			Vector3 newPos = new Vector3 (0, 0, 0);
+			transform.localPosition = newPos;
+		} else {
+			Vector3 newPos = new Vector3 (900, 0, 0);
+			transform.localPosition = newPos;
+		}
+	}
 
 	void LoadConfigs(){
 		monthsBR.Add ("Janeiro");
@@ -178,7 +190,7 @@ public class CalendarPopUp : MonoBehaviour
 			for (int i = 0; i < dayLabelsList.Count; i++) {
 				if(dayLabelsList[i].GetComponentInChildren<UILabel>().text != ""){
 					if(int.Parse(dayLabelsList[i].GetComponentInChildren<UILabel>().text) > DateTime.Now.Day){
-						dayLabelsList[i].GetComponentInChildren<UILabel>().color = Color.gray;
+						//dayLabelsList[i].GetComponentInChildren<UILabel>().color = Color.gray;
 					}
 				}
 			}
@@ -197,8 +209,13 @@ public class CalendarPopUp : MonoBehaviour
 
 	public void ShowCalendar (string childName, Texture2D childPhoto)
 	{
+		isActive = true;
+
 		Vector3 newPos = new Vector3 (0, 0, 0);
 		transform.localPosition = newPos;
+
+		Vector3 newPos2 = new Vector3 (-900, 0, 0);
+		childPanel.transform.localPosition = newPos2;
 
 		if (firstTimeOpeningCalendar) {
 			firstTimeOpeningCalendar = false;
@@ -219,8 +236,13 @@ public class CalendarPopUp : MonoBehaviour
 
 	public void CloseCalendar ()
 	{
+		isActive = false;
+
 		Vector3 newPos = new Vector3 (900, 0, 0);
 		transform.localPosition = newPos;
+
+		Vector3 newPos2 = new Vector3 (0, 0, 0);
+		childPanel.transform.localPosition = newPos2;
 
 		currentChild.closeCurrentChild ();
 	}
